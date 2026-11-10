@@ -1,0 +1,107 @@
+@import "tailwindcss";
+@import "@fontsource-variable/overpass";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@theme {
+  --font-sans: "Overpass Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-night: #0e1822;
+  --color-panel: #152330;
+  --color-raise: #1c2e3e;
+  --color-line: #263d50;
+  --color-ink: #eaf0f2;
+  --color-mute: #8ea3b3;
+  --color-sign: #0a6b45;
+  --color-sign-hi: #0d8556;
+  --color-paper: #ffffff;
+  --color-fog: #eef2f3;
+  --color-ash: #10202b;
+  --color-slate: #5b6e7c;
+  --color-idle: #27a47b;
+  --color-pickup: #c7821c;
+  --color-trip: #478de6;
+  --color-amber: #ffb23f;
+  --color-surge: #ff4d6d;
+  --color-danger: #c2364b;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-night);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1;
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+  background: rgba(14, 24, 34, 0.6) !important;
+  color: var(--color-mute);
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--color-mute);
+}
+
+.light-map .maplibregl-ctrl-attrib {
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: var(--color-slate);
+}
+
+.phone-scroll {
+  scrollbar-width: none;
+}
+
+.phone-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes ping-ring {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.ping-ring {
+  animation: ping-ring 1.8s ease-out infinite;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.rise {
+  animation: rise 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ping-ring,
+  .rise {
+    animation: none;
+  }
+}

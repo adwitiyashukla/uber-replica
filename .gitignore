@@ -1,0 +1,11 @@
+data/raw/
+web/node_modules/
+web/dist/
+results/
+*.test
+*.prof
+/crosstown
+/replay
+/loadgen
+__pycache__/
+*.exe

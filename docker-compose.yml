@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: crosstown
+      POSTGRES_PASSWORD: crosstown
+      POSTGRES_DB: crosstown
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crosstown"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://crosstown:crosstown@db:5432/crosstown?sslmode=disable
+      EMBEDDED_POSTGRES: "0"
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+volumes:
+  pgdata:

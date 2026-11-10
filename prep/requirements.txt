@@ -1,0 +1,7 @@
+numpy==2.5.3
+pandas==3.0.5
+pyarrow==26.0.0
+pyproj==3.8.0
+pyshp==3.1.6
+scipy==1.18.1
+shapely==2.2.0

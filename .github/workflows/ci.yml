@@ -1,0 +1,70 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: crosstown
+          POSTGRES_PASSWORD: crosstown
+          POSTGRES_DB: crosstown
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U crosstown"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        run: test -z "$(gofmt -l .)"
+      - name: vet
+        run: go vet ./...
+      - name: test
+        run: go test -race -count=1 ./...
+        env:
+          TEST_DATABASE_URL: postgres://crosstown:crosstown@localhost:5432/crosstown?sslmode=disable
+      - name: fuzz
+        run: |
+          go test -run=NONE -fuzz=FuzzQuoteToken -fuzztime=20s ./internal/engine
+          go test -run=NONE -fuzz=FuzzSearch -fuzztime=20s ./internal/city
+      - name: replay smoke run
+        run: go run ./cmd/replay -from 17:00 -to 17:30 -runs batch+b2b,greedy -quiet
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t crosstown .
+      - name: boot the image
+        run: |
+          docker run -d --name crosstown -p 7860:7860 crosstown
+          for i in $(seq 1 60); do curl -sf localhost:7860/healthz && break; sleep 2; done
+          curl -sf localhost:7860/api/meta > /dev/null
+          curl -sf localhost:7860/ | grep -q Crosstown
+          docker logs crosstown

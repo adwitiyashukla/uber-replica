@@ -1,0 +1,6 @@
+.git
+data/raw
+web/node_modules
+web/dist
+results
+screenshots
